@@ -8,11 +8,11 @@ import rain_icon from '../assets/rain.png'
 import snow_icon from '../assets/snow.png'
 import wind_icon from '../assets/wind.png'
 import humidity_icon from '../assets/humidity.png'
-import { use } from 'react'
 
 const Weather = () => {
     const inputRef = useRef()
     const [weatherData, setWeatherData] = useState(false)
+
     const allIcons = {
         "01d": clear_icon,
         "01n": clear_icon,
@@ -31,6 +31,7 @@ const Weather = () => {
         "13d": snow_icon,
         "13n": snow_icon,
     }
+
     const search = async (city) => {
         if (city === "") {
             alert("Please enter a city name")
@@ -44,8 +45,6 @@ const Weather = () => {
                 alert(data.message)
                 return
             }
-
-            console.log(data)
             const icon = allIcons[data.weather[0].icon] || clear_icon
             setWeatherData({
                 humidity: data.main.humidity,
@@ -59,39 +58,76 @@ const Weather = () => {
             console.error("Error fetching weather data")
         }
     }
+
     useEffect(() => {
         search("London")
     }, [])
-  return (
-    <div className='weather'>
-        <div className="search-bar">
-            <input ref={inputRef} type="text" name="" id="" placeholder='Search'/>
-            <img src={search_icon} alt="Search" onClick={() => search(inputRef.current.value)} />
-        </div>
-        {weatherData?<>
-        <img src={weatherData.icon} alt=""  className='weather_icon'/>
-        <p className='temperature'>{weatherData.temprature}°C</p>
-        <p className='location'>{weatherData.location}</p>
-        <div className="weather-data">
-            <div className="col">
-                <img src={humidity_icon} alt="" />
-                <div>
-                    <p>{weatherData.humidity} %</p>
-                    <span>Humidity</span>
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') search(inputRef.current.value)
+    }
+
+    return (
+        <div className="container-fluid px-3 px-sm-4 py-4 d-flex justify-content-center align-items-center min-vh-100">
+            <div className="weather-card card text-center">
+
+                {/* Search-Bar */}
+                <div className="search-bar d-flex align-items-center gap-2 mb-2">
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        className="search-input flex-grow-1"
+                        placeholder="Search city..."
+                        onKeyDown={handleKeyDown}
+                    />
+                    <button
+                        className="search-btn d-flex align-items-center justify-content-center flex-shrink-0"
+                        onClick={() => search(inputRef.current.value)}
+                        aria-label="Search"
+                    >
+                        <img src={search_icon} alt="Search" />
+                    </button>
                 </div>
-            </div>
-            <div className="col">
-                <img src={wind_icon} alt="" />
-                <div>
-                    <p>{weatherData.windSpeed} km/h</p>
-                    <span>Wind Speed</span>
-                </div>
+
+                {weatherData ? (
+                    <>
+                        {/* Weather-Icon */}
+                        <div className="d-flex justify-content-center my-3 my-md-4">
+                            <img
+                                src={weatherData.icon}
+                                alt="Weather icon"
+                                className="weather-icon img-fluid"
+                            />
+                        </div>
+
+                        {/* Temperature */}
+                        <p className="temperature mb-0">{weatherData.temprature}°C</p>
+
+                        {/* Location */}
+                        <p className="location mb-0">{weatherData.location}</p>
+
+                        {/* Humidity & Wind */}
+                        <div className="weather-data row g-3 mt-3 mt-md-4 w-100 mx-0">
+                            <div className="col-6 d-flex align-items-center gap-2 justify-content-center justify-content-sm-start">
+                                <img src={humidity_icon} alt="Humidity" className="weather-data-icon flex-shrink-0" />
+                                <div className="text-start">
+                                    <p className="mb-0 fw-semibold">{weatherData.humidity}%</p>
+                                    <span className="data-label">Humidity</span>
+                                </div>
+                            </div>
+                            <div className="col-6 d-flex align-items-center gap-2 justify-content-center justify-content-sm-start">
+                                <img src={wind_icon} alt="Wind Speed" className="weather-data-icon flex-shrink-0" />
+                                <div className="text-start">
+                                    <p className="mb-0 fw-semibold">{weatherData.windSpeed} km/h</p>
+                                    <span className="data-label">Wind Speed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : null}
             </div>
         </div>
-        </>:<></>}
-        
-    </div>
-  )
+    )
 }
 
 export default Weather
